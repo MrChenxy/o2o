@@ -90,4 +90,11 @@
       last_edit_time = #{lastEditTime,jdbcType=TIMESTAMP}
     where area_id = #{areaId,jdbcType=INTEGER}
   </update>
+  <select id="selectAllArea" resultMap="BaseResultMap">
+      select area_id, area_name,
+      priority, create_time, last_edit_time
+      from tb_area
+      order by priority
+      desc
+   </select>
 </mapper>

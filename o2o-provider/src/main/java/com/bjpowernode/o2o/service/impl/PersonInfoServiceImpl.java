@@ -1,11 +1,14 @@
 package com.bjpowernode.o2o.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.bjpowernode.o2o.domain.Area;
 import com.bjpowernode.o2o.domain.PersonInfo;
 import com.bjpowernode.o2o.mapper.PersonInfoMapper;
 import com.bjpowernode.o2o.service.PersonInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * @author Mr.chenxy
@@ -19,7 +22,7 @@ public class PersonInfoServiceImpl implements PersonInfoService {
 
     @Override
     public PersonInfo findPersonInfoById(Integer id) {
-        PersonInfo personInfo = personInfoMapper.selectByPrimaryKey(id);
-        return personInfo;
+        return personInfoMapper.selectByPrimaryKey(id);
     }
+
 }
