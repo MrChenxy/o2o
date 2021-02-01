@@ -2,7 +2,6 @@ package com.bjpowernode.o2o.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.bjpowernode.o2o.domain.Area;
-import com.bjpowernode.o2o.domain.PersonInfo;
 import com.bjpowernode.o2o.domain.Shop;
 import com.bjpowernode.o2o.domain.ShopCategory;
 import com.bjpowernode.o2o.dto.ImageHolder;
@@ -14,17 +13,18 @@ import com.bjpowernode.o2o.service.ShopCategoryService;
 import com.bjpowernode.o2o.service.ShopService;
 import com.bjpowernode.o2o.utils.CodeUtil;
 import com.bjpowernode.o2o.utils.HttpServletRequestUtil;
+import com.bjpowernode.o2o.utils.ShopSetImgUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-
+import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,24 +37,26 @@ import java.util.Map;
 @Controller
 public class ShopController {
 
-    @Reference(interfaceClass = ShopService.class,version = "1.0.0",check = false)
+    @Reference(interfaceClass = ShopService.class, version = "1.0.0", check = false)
     private ShopService shopService;
 
-    @Reference(interfaceClass = AreaService.class,version = "1.0.0",check = false)
+    @Reference(interfaceClass = AreaService.class, version = "1.0.0", check = false)
     private AreaService areaService;
 
-    @Reference(interfaceClass = ShopCategoryService.class,version = "1.0.0",check = false)
+    @Reference(interfaceClass = ShopCategoryService.class, version = "1.0.0", check = false)
     private ShopCategoryService shopCategoryService;
 
     @RequestMapping("/shop")
-    public String shop(){
+    public String shop() {
         return "shop/shopoperation";
     }
 
     @RequestMapping(value = "/shopadmin/registershop", method = RequestMethod.POST)
     @ResponseBody
     // 从表单中传来的店铺信息都会保存在request对象中
-    private Map<String, Object> registerShop(HttpServletRequest request) {
+    private Map<String, Object> registerShop(@RequestParam("shopImg") MultipartFile shopImg,
+                                             HttpServletRequest request) {
+
         Map<String, Object> modelMap = new HashMap<String, Object>();
         if (!CodeUtil.checkVerifyCode(request)) {
             modelMap.put("success", false);
@@ -75,35 +77,27 @@ public class ShopController {
             modelMap.put("errMsg", e.getMessage());
             return modelMap;
         }
-        // 接收图片
-        CommonsMultipartFile shopImg = null;
         // request.getSession().getServletContext() 从本次会话当中的上下文获取上传文件的内容
-        CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
-        // 判断request中是否有上传的文件流
-        if (commonsMultipartResolver.isMultipart(request)) {
-            // 如果有，先做类型转换。将request转成multipartHttpServletRequest
-            MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) request;
-            // 获取到文件流
-            shopImg = (CommonsMultipartFile) multipartHttpServletRequest.getFile("shopImg");
-        } else {
-            modelMap.put("success", false);
-            modelMap.put("errMsg", "上传图片不能为空");
-            return modelMap;
-        }
+        //CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver(request.getSession().getServletContext());
+        // 由于在前端验证了图片, 所以直接将request转成multipartHttpServletRequest
+        //MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) request;
+        // 获取到文件流
+        //shopImg = multipartHttpServletRequest.getFile("shopImg");
+
+
+
         // 2.注册店铺
         if (shop != null && shopImg != null) {
-			/*//因为现在还没有做登录功能，无法在session中获取user信息，会导致在添加shop时，由于没有owner_id而报错
-			PersonInfo owner = (PersonInfo) request.getSession().getAttribute("user");
-			shop.setOwner(owner);*/
-            //先将user写死
-            PersonInfo owner = new PersonInfo();
-            owner.setUserId(1);
-            shop.setOwnerId(6);
+            //先将ownerId写死
 
+            shop.setOwnerId(1);
             ShopExecution se;
             try {
                 ImageHolder imageHolder = new ImageHolder(shopImg.getOriginalFilename(), shopImg.getInputStream());
                 se = shopService.addShop(shop, imageHolder);
+                shop = se.getShop();
+                ShopSetImgUtil.addShopImg(shop, imageHolder);
+                shopService.updateShop(shop);
                 if (se.getState() == ShopStateEnum.CHECK.getState()) {
                     modelMap.put("success", true);
                     // 该用户可以操作的店铺列表
@@ -140,8 +134,9 @@ public class ShopController {
         List<ShopCategory> shopCategoryList = new ArrayList<ShopCategory>();
         List<Area> areaList = new ArrayList<Area>();
         try {
+            ShopCategory shopCategory = null;
             shopCategoryList = shopCategoryService
-                    .getShopCategoryList(new ShopCategory());
+                    .getShopCategoryList(shopCategory);
             areaList = areaService.getAllArea();
             modelMap.put("shopCategoryList", shopCategoryList);
             modelMap.put("areaList", areaList);

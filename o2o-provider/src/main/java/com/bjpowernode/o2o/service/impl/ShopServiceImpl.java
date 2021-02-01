@@ -12,6 +12,7 @@ import com.bjpowernode.o2o.utils.ImageUtil;
 import com.bjpowernode.o2o.utils.PathUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -20,6 +21,7 @@ import java.util.Date;
  * @date 2021/1/27
  */
 @Component
+@Transactional
 @Service(interfaceClass = ShopService.class, version = "1.0.0", timeout = 15000)
 public class ShopServiceImpl implements ShopService {
 
@@ -42,7 +44,7 @@ public class ShopServiceImpl implements ShopService {
             int effectedNum = shopMapper.insertSelective(shop);
             if (effectedNum <= 0) {
                 throw new ShopOperationException("店铺创建失败");
-            } else {
+            } /*else {
                 if (thumbnail.getImage() != null) {
                     // 存储图片
                     try {
@@ -56,18 +58,25 @@ public class ShopServiceImpl implements ShopService {
                         throw new ShopOperationException("更新图片地址失败");
                     }
                 }
-            }
+            }*/
         } catch (Exception e) {
             throw new ShopOperationException("addShop error:" + e.getMessage());
         }
         return new ShopExecution(ShopStateEnum.CHECK, shop);
     }
 
-    private void addShopImg(Shop shop, ImageHolder thumbnail) {
+    public void addShopImg(Shop shop, ImageHolder thumbnail) {
         // 获取shop图片目录的相对值路径
         String dest = PathUtil.getShopImagePath(shop.getShopId());
         String shopImgAddr = ImageUtil.generateThumbnail(thumbnail, dest);
         shop.setShopImg(shopImgAddr);
     }
+
+    @Override
+    public int updateShop(Shop shop) {
+        return shopMapper.updateByPrimaryKeySelective(shop);
+    }
+
+
 }
 

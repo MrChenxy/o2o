@@ -43,7 +43,7 @@
       #{priority,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{lastEditTime,jdbcType=TIMESTAMP}, 
       #{enableStatus,jdbcType=INTEGER}, #{advice,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.bjpowernode.o2o.domain.Shop" >
+  <insert id="insertSelective" parameterType="com.bjpowernode.o2o.domain.Shop" useGeneratedKeys="true" keyProperty="shopId">
     insert into tb_shop
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="shopId != null" >

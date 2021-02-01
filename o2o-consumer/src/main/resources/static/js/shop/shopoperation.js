@@ -82,19 +82,15 @@ $(function() {
         shop.phone = $('#shop-phone').val();
         shop.shopDesc = $('#shop-desc').val();
         // 选择选定好的店铺类别
-        shop.shopCategory = {
-            shopCategoryId : $('#shop-category').find('option').not(function() {
-                return !this.selected;
-            }).data('id')
-        };
+        shop.shopCategoryId = $('#shop-category').find('option').not(function() {return !this.selected;}).data('id');
         // 选择选定好的区域信息
-        shop.area = {
-            areaId : $('#area').find('option').not(function() {
-                return !this.selected;
-            }).data('id')
-        };
-        // 获取上传的图片文件流
+        shop.areaId = $('#area').find('option').not(function() {return !this.selected;}).data('id');
+        // 获取上传的图片文件流并判断有没有选择, 没有return
         var shopImg = $('#shop-img')[0].files[0];
+        if (!shopImg) {
+            $.toast('请选择图片！');
+            return;
+        }
         // 生成表单对象，用于接收参数并传递给后台
         var formData = new FormData();
         // 添加图片流进表单对象里
@@ -103,7 +99,6 @@ $(function() {
         formData.append('shopStr', JSON.stringify(shop));
         // 获取表单里输入的验证码
         var verifyCodeActual = $('#j_captcha').val();
-        alert(verifyCodeActual);
         if (!verifyCodeActual) {
             $.toast('请输入验证码！');
             return;

@@ -12,6 +12,8 @@ import com.bjpowernode.o2o.exception.ShopOperationException;
 public interface ShopService {
 
     ShopExecution addShop(Shop shop, ImageHolder thumbnail) throws ShopOperationException;
+
+    int updateShop(Shop shop);
 }
 
 

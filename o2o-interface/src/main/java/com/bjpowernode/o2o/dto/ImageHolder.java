@@ -6,7 +6,7 @@ import java.io.Serializable;
 public class ImageHolder implements Serializable {
 
 	private String imageName;
-	private InputStream image;
+	private transient InputStream image;
 
 	public ImageHolder(String imageName, InputStream image) {
 		this.imageName = imageName;
@@ -28,5 +28,4 @@ public class ImageHolder implements Serializable {
 	public void setImage(InputStream image) {
 		this.image = image;
 	}
-
 }

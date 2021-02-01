@@ -5,11 +5,11 @@ import com.google.code.kaptcha.impl.DefaultKaptcha;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 
@@ -25,14 +25,13 @@ public class KaptchaController {
     private KaptchaConfig kaptchaConfig;
 
     @RequestMapping("/conf/KaptchaConfig")
-    @ResponseBody
-    public void kaptchaConfig(HttpServletResponse httpServletResponse) throws Exception{
+    public void kaptchaConfig(HttpServletResponse httpServletResponse, HttpSession session) throws Exception{
         byte[] captchaChallengeAsJpeg = null;
         ByteArrayOutputStream jpegOutputStream = new ByteArrayOutputStream();
 
         DefaultKaptcha defaultKaptcha = kaptchaConfig.getDefaultKaptcha();
         String text = defaultKaptcha.createText();
-
+        session.setAttribute("KAPTCHA_CODE", text);
         BufferedImage challenge  = defaultKaptcha.createImage(text);
 
         ImageIO.write(challenge, "jpg", jpegOutputStream);

@@ -43,11 +43,22 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.code</groupId>
+            <artifactId>kaptcha</artifactId>
+            <version>2.3.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.4</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.bjpowernode.o2o</groupId>
             <artifactId>o2o-interface</artifactId>
             <version>1.0.0</version>
         </dependency>
-
     </dependencies>
 
     <build>

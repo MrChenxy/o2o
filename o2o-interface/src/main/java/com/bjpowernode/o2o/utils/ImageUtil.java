@@ -65,7 +65,7 @@ public class ImageUtil {
 		// 调用Thumbnails生成带有水印的图片
 		try {
 			Thumbnails.of(thumbnail.getImage()).size(200, 200)
-					.watermark(Positions.BOTTOM_RIGHT, ImageIO.read(new File(basePath + "/watermark.jpg")), 0.25f)
+					//.watermark(Positions.BOTTOM_RIGHT, ImageIO.read(new File(basePath + "/watermark.jpg")), 0.25f)
 					.outputQuality(0.8f).toFile(dest);
 		} catch (IOException e) {
 			logger.error(e.toString());
